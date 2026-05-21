@@ -3,6 +3,7 @@ import cors from "cors";
 import { toNodeHandler } from "better-auth/node";
 
 import routes from "./routes/user.route";
+import routesFavorite from "./routes/favorite.route"
 import { auth } from "./lib/auth";
 
 const app = express();
@@ -20,6 +21,8 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 
 
 app.use(express.json());
+
+app.use("/api/favorites", routesFavorite);
 
 app.use("/api/user", routes);
 

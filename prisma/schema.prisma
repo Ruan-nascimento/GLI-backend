@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  id            String          @id
+  name          String?
+  email         String          @unique
+  emailVerified Boolean
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime
+  updatedAt     DateTime
 
   sessions      Session[]
   accounts      Account[]
+  favorites     FavoritePlace[]
 
   @@map("user")
 }
@@ -36,6 +37,29 @@ model Session {
   @@unique([token])
   @@index([userId])
   @@map("session")
+}
+
+model FavoritePlace {
+  id          String   @id @default(cuid())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  placeId     String
+  name        String
+  category    String
+  description String?
+  rating      Float?
+  hours       String?
+  latitude    Float?
+  longitude   Float?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, placeId])
+  @@index([userId])
+  @@map("favorite_place")
 }
 
 model Account {
