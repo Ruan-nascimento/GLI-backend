@@ -1,59 +1,65 @@
 import type { Request, Response } from "express";
 import {
-  createFavorite,
-  deleteFavorite,
-  getFavorites,
+    createFavorite,
+    deleteFavorite,
+    getFavorites,
 } from "../services/favorite.service";
 
 export async function createFavoriteController(req: Request, res: Response) {
-  try {
-    const userId = String(req.user?.id);
+    try {
+        const userId = String(req.user?.id);
+        const { placeId, name, category } = req.body;
 
-    const favorite = await createFavorite({
-      userId,
-      placeId: String(req.body.placeId),
-      name: req.body.name,
-      category: req.body.category,
-      description: req.body.description,
-      rating: req.body.rating,
-      hours: req.body.hours,
-      latitude: req.body.latitude,
-      longitude: req.body.longitude,
-    });
+        if (!placeId || !name || !category) {
+            return res.status(400).json({
+                message: "Dados obrigatórios do local não enviados.",
+            });
+        }
 
-    return res.status(201).json(favorite);
-  } catch (error) {
-    return res.status(500).json({
-      message: "Erro ao adicionar favorito.",
-    });
-  }
+        const favorite = await createFavorite({
+            userId,
+            placeId: String(placeId),
+            name,
+            category,
+            description: req.body.description ?? null,
+            rating: req.body.rating ?? null,
+            hours: req.body.hours ?? null,
+            latitude: req.body.latitude ?? null,
+            longitude: req.body.longitude ?? null,
+        });
+
+        return res.status(201).json(favorite);
+    } catch {
+        return res.status(500).json({
+            message: "Erro ao adicionar favorito.",
+        });
+    }
 }
 
 export async function listFavoritesController(req: Request, res: Response) {
-  try {
-    const userId = String(req.user?.id);
+    try {
+        const userId = String(req.user?.id);
+        const favorites = await getFavorites(userId);
 
-    const favorites = await getFavorites(userId);
-
-    return res.json(favorites);
-  } catch (error) {
-    return res.status(500).json({
-      message: "Erro ao listar favoritos.",
-    });
-  }
+        return res.json(favorites);
+    } catch {
+        return res.status(500).json({
+            message: "Erro ao listar favoritos.",
+        });
+    }
 }
 
 export async function deleteFavoriteController(req: Request, res: Response) {
-  try {
-    const userId = String(req.user?.id);
-    const { placeId } = req.params;
+    try {
+        const userId = String(req.user?.id);
+        const { placeId } = req.params;
 
-    await deleteFavorite(userId, placeId as string);
+        await deleteFavorite(userId, placeId as string);
 
-    return res.status(204).send();
-  } catch (error) {
-    return res.status(500).json({
-      message: "Erro ao remover favorito.",
-    });
-  }
+        return res.status(204).send();
+    } catch {
+        return res.status(500).json({
+            message: "Erro ao remover favorito.",
+        });
+    }
 }

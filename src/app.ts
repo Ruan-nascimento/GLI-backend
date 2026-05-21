@@ -1,9 +1,8 @@
 import express from "express";
 import cors from "cors";
 import { toNodeHandler } from "better-auth/node";
-
-import routes from "./routes/user.route";
-import routesFavorite from "./routes/favorite.route"
+import userRoutes from "./routes/user.route";
+import favoriteRoutes from "./routes/favorite.route";
 import { auth } from "./lib/auth";
 
 const app = express();
@@ -16,15 +15,12 @@ app.use(
     })
 );
 
-
 app.all("/api/auth/*splat", toNodeHandler(auth));
-
 
 app.use(express.json());
 
-app.use("/api/favorites", routesFavorite);
-
-app.use("/api/user", routes);
+app.use("/api/user", userRoutes);
+app.use("/api/favorites", favoriteRoutes);
 
 app.get("/api/me", async (req, res) => {
     const { fromNodeHeaders } = await import("better-auth/node");
